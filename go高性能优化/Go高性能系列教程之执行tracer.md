@@ -48,7 +48,8 @@
 
 运行该命令后，一个浏览器窗口会被打开，页面上有一些选项。每一个选项都会打开一个不同的跟踪视图，包含程序执行的不同信息。
 
-图：trace-opt.png
+![图：trace-opt.png](./images/trace-opts.png)
+
 
 #### View trace
 最复杂、最强大、最具交互性的可视化显示了整个程序执行的时间表。例如，该视图显示了在每个虚拟处理器上正在在执行的内容以及在等待运行时被阻塞的内容。稍后我们会深入探讨这个可视化内容。
@@ -66,7 +67,7 @@
 点击“View trace”链接，是关于整个程序执行的视图。
 
 下图中高亮的部分是该视图最重要的部分，每一个模块在下面有详细描述：
-图：view-trace.png
+![图：view-trace.png](./images/view-trace.png)
 
 1. Timeline
 展示了在执行期间的时间，并且通过导航按钮可以改变时间单位。通过键盘的快捷键（WASD键，像视频游戏）可以左右移动、放大缩小时间轴线。
@@ -90,7 +91,7 @@
 
 下面这张图显示了当选择了一个特定的协程后所收集到的信息。
 
-图：view-goroutine.png
+![图：view-goroutine.png](./images/view-goroutine.png)
 
 包括以下信息：
 + 协程的名称（Title）
@@ -102,7 +103,7 @@
 
 我们可以看到，该协程创建了两个时间：跟踪器协程和往channel上发送42数据的协程。
 
-图：view-event.png
+![图：view-event.png](./images/view-event.png)
 
 点击一个特定的事件（图上的一行或点击协程后选择某个特定的事件），我们会看到：
 + 当时间开始的时候的栈跟踪信息
@@ -116,7 +117,7 @@
 
 下面这张图显示了我们代码的“Synchronization blocking profile”。
 
-图四：blocking-profile.png
+![图四：blocking-profile.png](./images/blocking-profile.png)
 
 该图告诉我们 main 协程在从channel中接收数据时阻塞了12.08毫秒。当许多协程在竞争获取一个共享资源的锁的时候，这个图是可以发现锁竞争的非常好的方式。
 
@@ -155,7 +156,6 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 为了能够收集跟踪数，我们需要给该节点发送一个请求，例如 *curl localhost:8181/debug/pprof/trace?seconds=10 > trace.out*。该请求将会阻塞10秒，然后跟踪数据被写入到trace.out文件中。然后就可以通过 *go tool trace trace.out* 命令来查看分析跟踪数据了。
 
 > 安全提示：注意将pprof的处理器暴露在互联网上是不可取的。建议在仅绑定到本地可访问不同的http.Server上。[该博客](http://mmcloughlin.com/posts/your-pprof-is-showing)讨论了这些风险，并提供了有关如何正确处理pprof handler的代码示例
-> 
 
 在收集跟踪数据之前，先使用 wrk 工具给我们的服务制造一些压力：
 
@@ -179,7 +179,7 @@ Scheduler latency profile
 
 点击 “View trace（2.546634537s-5.00392737s）”我们看到发生了很多事情：
 
-图五:trace-web.png
+![图五:trace-web.png](./images/trace-web.png)
 
 这部分截屏显示了在1169毫秒到1170毫秒之间开始运行的GC，以及在1174毫秒之后结束。在此期间，一个OS线程（proc1）运行一个专门用于GC的协程，而其他协程在某些GC阶段会提供辅助（这些会在goroutine行中显示，并被有“辅助标记”）。在结束结束的位置，我们看到，分配的内存大部分是由GC释放的。
 
@@ -192,7 +192,6 @@ Scheduler latency profile
 这个工具真正的用处在于当你想了解该程序在运行这段时间内都做了什么事情以及想知道当没有协程在运行时每个协程正在做什么的场景。收集跟踪可能会有一定的开销，并且会产生大量的检查数据。
 
 不幸的是，官方文档比较匮乏，所以一些实验需要尝试并理解跟踪器正在展示的内容。当然这也是一个给社区官方文档贡献的好机会。
-
 
 
 
